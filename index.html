@@ -29,45 +29,6 @@
     .header h1 { font-size: 22px; margin-bottom: 6px; }
     .header p { font-size: 13px; opacity: 0.85; }
 
-    .config-panel {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .config-panel h2 {
-      font-size: 15px;
-      color: #333;
-      margin-bottom: 12px;
-    }
-    .config-panel input {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 10px;
-      outline: none;
-    }
-    .config-panel input:focus { border-color: #667eea; }
-    .config-row {
-      display: flex;
-      gap: 10px;
-    }
-    .config-row input { flex: 1; }
-    .save-btn {
-      width: 100%;
-      padding: 10px;
-      background: #667eea;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .save-btn:hover { background: #5a6fd6; }
-
     .post-area {
       background: #fff;
       padding: 20px;
@@ -166,18 +127,7 @@
       margin-top: 12px;
     }
     .refresh-btn:hover { background: #e9ecef; }
-    .toggle-config {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .toggle-config a {
-      color: #667eea;
-      font-size: 13px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .toggle-config a:hover { text-decoration: underline; }
-    .hint {
+    .error-hint {
       background: #fff3cd;
       border: 1px solid #ffc107;
       padding: 12px;
@@ -196,23 +146,6 @@
       <p>给对方留句话吧</p>
     </div>
 
-    <div id="hintArea" class="hint" style="display:none;"></div>
-
-    <div class="toggle-config">
-      <a onclick="toggleConfig()">⚙️ 设置</a>
-    </div>
-
-    <div id="configPanel" class="config-panel" style="display:none;">
-      <h2>配置（只需填一次）</h2>
-      <input id="cfgToken" type="password" placeholder="GitHub Token（需要 repo 权限）">
-      <div class="config-row">
-        <input id="cfgOwner" placeholder="GitHub 用户名">
-        <input id="cfgRepo" placeholder="仓库名">
-      </div>
-      <input id="cfgIssueNum" type="number" placeholder="Issue 编号（先在仓库里建一个 Issue）" min="1">
-      <button class="save-btn" onclick="saveConfig()">保存配置</button>
-    </div>
-
     <div class="post-area">
       <textarea id="msgInput" placeholder="写点什么..."></textarea>
       <div class="post-row">
@@ -228,75 +161,32 @@
   </div>
 
   <script>
-    var CONFIG_KEY = 'guestbook_config';
-    var config = loadConfig();
-
-    function loadConfig() {
-      try {
-        var raw = localStorage.getItem(CONFIG_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch(e) {}
-      return {};
-    }
-
-    function saveConfig() {
-      var token = document.getElementById('cfgToken').value.trim();
-      var owner = document.getElementById('cfgOwner').value.trim();
-      var repo = document.getElementById('cfgRepo').value.trim();
-      var issueNum = document.getElementById('cfgIssueNum').value.trim();
-      if (!token || !owner || !repo || !issueNum) {
-        alert('请把所有字段都填上');
-        return;
-      }
-      config = { token: token, owner: owner, repo: repo, issueNum: issueNum };
-      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-      document.getElementById('configPanel').style.display = 'none';
-      showHint('✅ 配置已保存！刷新页面开始使用吧');
-      loadMessages();
-    }
-
-    function toggleConfig() {
-      var panel = document.getElementById('configPanel');
-      if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        document.getElementById('cfgToken').value = config.token || '';
-        document.getElementById('cfgOwner').value = config.owner || '';
-        document.getElementById('cfgRepo').value = config.repo || '';
-        document.getElementById('cfgIssueNum').value = config.issueNum || '';
-      } else {
-        panel.style.display = 'none';
-      }
-    }
-
-    function showHint(msg) {
-      var hint = document.getElementById('hintArea');
-      hint.innerHTML = msg;
-      hint.style.display = 'block';
-      setTimeout(function() { hint.style.display = 'none'; }, 5000);
-    }
-
-    function checkConfig() {
-      if (!config.token || !config.owner || !config.repo || !config.issueNum) {
-        document.getElementById('messages').innerHTML =
-          '<div class="empty">⚠️ 请先点上方 "⚙️ 设置" 完成配置<br><br>' +
-          '需要准备：<br>' +
-          '1. GitHub Token（个人设置 → Developer settings → Personal access tokens → Generate new token，勾选 repo）<br>' +
-          '2. 你仓库里新建一个 Issue（随便写个标题），记下编号<br>' +
-          '3. 你的用户名和仓库名</div>';
-        return false;
-      }
-      return true;
-    }
+    // ============================================================
+    // ⚠️ 配置区：把下面 4 个值改成你自己的，然后重新上传到 GitHub
+    // ============================================================
+    var CONFIG = {
+      token: '',              // ⚠️ 填你的 Token（ghp_ 开头）
+      owner: '7770748737',    // ✅ 已填好
+      repo: '22222',          // ✅ 已填好
+      issueNum: ''            // ⚠️ 填你的 Issue 编号（比如 1）
+    };
+    // ============================================================
 
     async function loadMessages() {
-      if (!checkConfig()) return;
+      if (!CONFIG.token || !CONFIG.owner || !CONFIG.repo || !CONFIG.issueNum) {
+        document.getElementById('messages').innerHTML =
+          '<div class="empty">⚠️ 网站还没配置好<br><br>' +
+          '请修改 index.html 里的 CONFIG 配置区<br>' +
+          '填入 token / owner / repo / issueNum</div>';
+        return;
+      }
       var messagesEl = document.getElementById('messages');
       messagesEl.innerHTML = '<div class="empty">加载中...</div>';
       try {
         var resp = await fetch(
-          'https://api.github.com/repos/' + config.owner + '/' + config.repo +
-          '/issues/' + config.issueNum + '/comments',
-          { headers: { Authorization: 'token ' + config.token } }
+          'https://api.github.com/repos/' + CONFIG.owner + '/' + CONFIG.repo +
+          '/issues/' + CONFIG.issueNum + '/comments',
+          { headers: { Authorization: 'token ' + CONFIG.token } }
         );
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var comments = await resp.json();
@@ -324,12 +214,15 @@
           '</div>';
         }).join('');
       } catch(e) {
-        messagesEl.innerHTML = '<div class="empty">❌ 加载失败：' + e.message + '<br>请检查 Token / 用户名 / 仓库名 / Issue 编号</div>';
+        messagesEl.innerHTML = '<div class="empty">❌ 加载失败：' + e.message + '</div>';
       }
     }
 
     async function postMessage() {
-      if (!checkConfig()) return;
+      if (!CONFIG.token || !CONFIG.owner || !CONFIG.repo || !CONFIG.issueNum) {
+        alert('网站还没配置好，请先修改 index.html 里的 CONFIG 配置区');
+        return;
+      }
       var input = document.getElementById('msgInput');
       var nick = document.getElementById('nickInput');
       var text = input.value.trim();
@@ -343,12 +236,12 @@
       try {
         var body = '【' + nickname + '】' + text;
         var resp = await fetch(
-          'https://api.github.com/repos/' + config.owner + '/' + config.repo +
-          '/issues/' + config.issueNum + '/comments',
+          'https://api.github.com/repos/' + CONFIG.owner + '/' + CONFIG.repo +
+          '/issues/' + CONFIG.issueNum + '/comments',
           {
             method: 'POST',
             headers: {
-              Authorization: 'token ' + config.token,
+              Authorization: 'token ' + CONFIG.token,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ body: body })
