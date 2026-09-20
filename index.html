@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>留言板</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .header h1 { font-size: 22px; margin-bottom: 6px; }
+    .header p { font-size: 13px; opacity: 0.85; }
+
+    .config-panel {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .config-panel h2 {
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .config-panel input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 10px;
+      outline: none;
+    }
+    .config-panel input:focus { border-color: #667eea; }
+    .config-row {
+      display: flex;
+      gap: 10px;
+    }
+    .config-row input { flex: 1; }
+    .save-btn {
+      width: 100%;
+      padding: 10px;
+      background: #667eea;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .save-btn:hover { background: #5a6fd6; }
+
+    .post-area {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .post-area textarea {
+      width: 100%;
+      height: 80px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: vertical;
+      outline: none;
+      font-family: inherit;
+    }
+    .post-area textarea:focus { border-color: #667eea; }
+    .post-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .nickname-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      margin-right: 10px;
+    }
+    .nickname-input:focus { border-color: #667eea; }
+    .post-btn {
+      padding: 8px 20px;
+      background: #667eea;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .post-btn:hover { background: #5a6fd6; }
+    .post-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    .messages {
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .msg {
+      padding: 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .msg:last-child { border-bottom: none; }
+    .msg-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .msg-name {
+      font-weight: 600;
+      color: #667eea;
+      font-size: 14px;
+    }
+    .msg-time {
+      color: #999;
+      font-size: 12px;
+    }
+    .msg-content {
+      color: #333;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .empty {
+      text-align: center;
+      color: #999;
+      padding: 40px 20px;
+      font-size: 14px;
+    }
+    .refresh-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      color: #666;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .refresh-btn:hover { background: #e9ecef; }
+    .toggle-config {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .toggle-config a {
+      color: #667eea;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .toggle-config a:hover { text-decoration: underline; }
+    .hint {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #856404;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💬 留言板</h1>
+      <p>给对方留句话吧</p>
+    </div>
+
+    <div id="hintArea" class="hint" style="display:none;"></div>
+
+    <div class="toggle-config">
+      <a onclick="toggleConfig()">⚙️ 设置</a>
+    </div>
+
+    <div id="configPanel" class="config-panel" style="display:none;">
+      <h2>配置（只需填一次）</h2>
+      <input id="cfgToken" type="password" placeholder="GitHub Token（需要 repo 权限）">
+      <div class="config-row">
+        <input id="cfgOwner" placeholder="GitHub 用户名">
+        <input id="cfgRepo" placeholder="仓库名">
+      </div>
+      <input id="cfgIssueNum" type="number" placeholder="Issue 编号（先在仓库里建一个 Issue）" min="1">
+      <button class="save-btn" onclick="saveConfig()">保存配置</button>
+    </div>
+
+    <div class="post-area">
+      <textarea id="msgInput" placeholder="写点什么..."></textarea>
+      <div class="post-row">
+        <input id="nickInput" class="nickname-input" placeholder="你的昵称" value="">
+        <button class="post-btn" id="postBtn" onclick="postMessage()">留言</button>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="empty">加载中...</div>
+    </div>
+    <button class="refresh-btn" onclick="loadMessages()">🔄 刷新留言</button>
+  </div>
+
+  <script>
+    var CONFIG_KEY = 'guestbook_config';
+    var config = loadConfig();
+
+    function loadConfig() {
+      try {
+        var raw = localStorage.getItem(CONFIG_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch(e) {}
+      return {};
+    }
+
+    function saveConfig() {
+      var token = document.getElementById('cfgToken').value.trim();
+      var owner = document.getElementById('cfgOwner').value.trim();
+      var repo = document.getElementById('cfgRepo').value.trim();
+      var issueNum = document.getElementById('cfgIssueNum').value.trim();
+      if (!token || !owner || !repo || !issueNum) {
+        alert('请把所有字段都填上');
+        return;
+      }
+      config = { token: token, owner: owner, repo: repo, issueNum: issueNum };
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+      document.getElementById('configPanel').style.display = 'none';
+      showHint('✅ 配置已保存！刷新页面开始使用吧');
+      loadMessages();
+    }
+
+    function toggleConfig() {
+      var panel = document.getElementById('configPanel');
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        document.getElementById('cfgToken').value = config.token || '';
+        document.getElementById('cfgOwner').value = config.owner || '';
+        document.getElementById('cfgRepo').value = config.repo || '';
+        document.getElementById('cfgIssueNum').value = config.issueNum || '';
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+
+    function showHint(msg) {
+      var hint = document.getElementById('hintArea');
+      hint.innerHTML = msg;
+      hint.style.display = 'block';
+      setTimeout(function() { hint.style.display = 'none'; }, 5000);
+    }
+
+    function checkConfig() {
+      if (!config.token || !config.owner || !config.repo || !config.issueNum) {
+        document.getElementById('messages').innerHTML =
+          '<div class="empty">⚠️ 请先点上方 "⚙️ 设置" 完成配置<br><br>' +
+          '需要准备：<br>' +
+          '1. GitHub Token（个人设置 → Developer settings → Personal access tokens → Generate new token，勾选 repo）<br>' +
+          '2. 你仓库里新建一个 Issue（随便写个标题），记下编号<br>' +
+          '3. 你的用户名和仓库名</div>';
+        return false;
+      }
+      return true;
+    }
+
+    async function loadMessages() {
+      if (!checkConfig()) return;
+      var messagesEl = document.getElementById('messages');
+      messagesEl.innerHTML = '<div class="empty">加载中...</div>';
+      try {
+        var resp = await fetch(
+          'https://api.github.com/repos/' + config.owner + '/' + config.repo +
+          '/issues/' + config.issueNum + '/comments',
+          { headers: { Authorization: 'token ' + config.token } }
+        );
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var comments = await resp.json();
+        if (comments.length === 0) {
+          messagesEl.innerHTML = '<div class="empty">还没有留言，快来抢沙发 🛋️</div>';
+          return;
+        }
+        messagesEl.innerHTML = comments.map(function(c) {
+          var body = c.body || '';
+          var name = '匿名';
+          var text = body;
+          var nickMatch = body.match(/^【([^】]+)】/);
+          if (nickMatch) {
+            name = nickMatch[1];
+            text = body.substring(nickMatch[0].length);
+          }
+          var time = new Date(c.created_at);
+          var timeStr = time.toLocaleString('zh-CN');
+          return '<div class="msg">' +
+            '<div class="msg-top">' +
+              '<span class="msg-name">' + escapeHtml(name) + '</span>' +
+              '<span class="msg-time">' + timeStr + '</span>' +
+            '</div>' +
+            '<div class="msg-content">' + escapeHtml(text) + '</div>' +
+          '</div>';
+        }).join('');
+      } catch(e) {
+        messagesEl.innerHTML = '<div class="empty">❌ 加载失败：' + e.message + '<br>请检查 Token / 用户名 / 仓库名 / Issue 编号</div>';
+      }
+    }
+
+    async function postMessage() {
+      if (!checkConfig()) return;
+      var input = document.getElementById('msgInput');
+      var nick = document.getElementById('nickInput');
+      var text = input.value.trim();
+      var nickname = nick.value.trim() || '匿名';
+      if (!text) { alert('留言内容不能为空'); return; }
+
+      var btn = document.getElementById('postBtn');
+      btn.disabled = true;
+      btn.textContent = '发送中...';
+
+      try {
+        var body = '【' + nickname + '】' + text;
+        var resp = await fetch(
+          'https://api.github.com/repos/' + config.owner + '/' + config.repo +
+          '/issues/' + config.issueNum + '/comments',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: 'token ' + config.token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ body: body })
+          }
+        );
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        input.value = '';
+        loadMessages();
+      } catch(e) {
+        alert('留言失败：' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '留言';
+      }
+    }
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>
