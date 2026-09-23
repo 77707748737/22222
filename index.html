@@ -7,149 +7,108 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, "Segoe UI", sans-serif;
-      background: #f0f2f5;
+      font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 20px;
     }
-    .container {
-      width: 100%;
-      max-width: 600px;
-    }
+    .container { width: 100%; max-width: 640px; }
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      margin-bottom: 20px;
+      background: rgba(255,255,255,0.95);
+      color: #333;
+      padding: 28px 24px;
+      border-radius: 16px;
+      margin-bottom: 16px;
       text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     }
-    .header h1 { font-size: 22px; margin-bottom: 6px; }
-    .header p { font-size: 13px; opacity: 0.85; }
-
+    .header h1 { font-size: 24px; margin-bottom: 6px; color: #667eea; }
+    .header p { font-size: 13px; color: #888; }
     .post-area {
       background: #fff;
       padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     }
     .post-area textarea {
-      width: 100%;
-      height: 80px;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      resize: vertical;
-      outline: none;
-      font-family: inherit;
+      width: 100%; height: 90px; padding: 12px;
+      border: 1px solid #e0e0e0; border-radius: 10px;
+      font-size: 14px; resize: vertical; outline: none;
+      font-family: inherit; transition: border-color 0.2s;
     }
     .post-area textarea:focus { border-color: #667eea; }
-    .post-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
-    }
+    .post-row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
     .nickname-input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-      margin-right: 10px;
+      flex: 1; padding: 10px 14px; border: 1px solid #e0e0e0;
+      border-radius: 10px; font-size: 14px; outline: none;
+      transition: border-color 0.2s;
     }
     .nickname-input:focus { border-color: #667eea; }
     .post-btn {
-      padding: 8px 20px;
-      background: #667eea;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff; border: none; border-radius: 10px;
+      cursor: pointer; font-size: 14px; font-weight: 500;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .post-btn:hover { background: #5a6fd6; }
-    .post-btn:disabled { background: #ccc; cursor: not-allowed; }
-
+    .post-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+    }
+    .post-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .messages {
-      background: #fff;
-      border-radius: 12px;
-      padding: 10px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      background: #fff; border-radius: 16px; padding: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1); min-height: 120px;
     }
     .msg {
-      padding: 14px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .msg:last-child { border-bottom: none; }
-    .msg-top {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
+    .msg-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .msg-name { font-weight: 600; color: #667eea; font-size: 14px; }
+    .msg-time { color: #aaa; font-size: 12px; }
+    .msg-content { color: #333; font-size: 14px; line-height: 1.6; word-break: break-word; white-space: pre-wrap; }
+    .empty { text-align: center; color: #aaa; padding: 40px 20px; font-size: 14px; }
+    .toolbar { display: flex; gap: 10px; margin-top: 12px; }
+    .tool-btn {
+      flex: 1; padding: 10px;
+      background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px; color: #666; font-size: 13px; cursor: pointer;
+      transition: background 0.2s;
     }
-    .msg-name {
-      font-weight: 600;
-      color: #667eea;
-      font-size: 14px;
+    .tool-btn:hover { background: #fff; }
+    .tool-btn.test { background: #fff3cd; border-color: #ffc107; color: #856404; }
+    .tool-btn.test:hover { background: #ffeaa7; }
+    #testResult {
+      margin-top: 10px; background: rgba(255,255,255,0.95);
+      border-radius: 10px; padding: 14px; font-size: 13px;
+      line-height: 1.8; color: #555; display: none;
     }
-    .msg-time {
-      color: #999;
-      font-size: 12px;
-    }
-    .msg-content {
-      color: #333;
-      font-size: 14px;
-      line-height: 1.5;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-    .empty {
-      text-align: center;
-      color: #999;
-      padding: 40px 20px;
-      font-size: 14px;
-    }
-    .refresh-btn {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 8px;
-      color: #666;
-      font-size: 13px;
-      cursor: pointer;
-      margin-top: 12px;
-    }
-    .refresh-btn:hover { background: #e9ecef; }
-    .error-hint {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #856404;
-      margin-bottom: 16px;
-      line-height: 1.6;
-    }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .status-ok { background: #28a745; }
+    .status-err { background: #dc3545; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>💬 留言板</h1>
-      <p>给对方留句话吧</p>
+      <p>留下你想说的话</p>
     </div>
 
     <div class="post-area">
-      <textarea id="msgInput" placeholder="写点什么..."></textarea>
+      <textarea id="msgInput" placeholder="写点什么... (支持换行)"></textarea>
       <div class="post-row">
-        <input id="nickInput" class="nickname-input" placeholder="你的昵称" value="">
+        <input id="nickInput" class="nickname-input" placeholder="你的昵称 (可留空)" maxlength="20">
         <button class="post-btn" id="postBtn" onclick="postMessage()">留言</button>
       </div>
     </div>
@@ -157,70 +116,126 @@
     <div class="messages" id="messages">
       <div class="empty">加载中...</div>
     </div>
-    <button class="refresh-btn" onclick="loadMessages()">🔄 刷新留言</button>
+
+    <div class="toolbar">
+      <button class="tool-btn" onclick="loadMessages()">🔄 刷新</button>
+      <button class="tool-btn test" onclick="testConfig()">🔧 测试配置</button>
+    </div>
+    <div id="testResult"></div>
   </div>
 
   <script>
     // ============================================================
-    // ⚠️ 配置区：把下面 4 个值改成你自己的，然后重新上传到 GitHub
+    // ⚠️ 配置区：把下面 2 个值改成你自己的，然后提交到 GitHub
+    // 获取方法见下方注释
     // ============================================================
     var CONFIG = {
-      token: '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',              // ⚠️ 填你的 Token（ghp_ 开头）
-      owner: '7770748737',    // ✅ 已填好
-      repo: '22222',          // ✅ 已填好
-      issueNum:'2'            // ⚠️ 填你的 Issue 编号（比如 1）
+      masterKey: '$2a$10$IdEOfGBNwuQ9TZ2.Il52U.L.QtWRc0.O2p0jWeUEy9c.XE2NO5wr2',  // 在 https://jsonbin.io/me/api-keys 复制 X-Master-Key
+      binId:     '6ab3afdeffd5d160532661a7'  // 第一次运行后会自动创建并显示提示
     };
+    // 获取步骤：
+    //   1. 注册 https://jsonbin.io (免费)
+    //   2. 登录后访问 https://jsonbin.io/me/api-keys，复制 X-Master-Key
+    //   3. 填到上面 masterKey，保存
+    //   4. 双击打开 index.html，点"测试配置"按钮 → 会自动创建 bin 并显示 BIN_ID
+    //   5. 把 BIN_ID 复制到上面 binId，再保存重新部署
     // ============================================================
 
+    var LOCAL_BIN_KEY = 'messageboard_bin_id';
+
+    async function getBinId() {
+      if (CONFIG.binId && CONFIG.binId !== 'YOUR_BIN_ID_HERE') {
+        return CONFIG.binId;
+      }
+      var cached = localStorage.getItem(LOCAL_BIN_KEY);
+      if (cached) return cached;
+      return null;
+    }
+
+    async function createBin() {
+      var resp = await fetch('https://api.jsonbin.io/v3/b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': CONFIG.masterKey,
+          'X-Bin-Name': 'messageboard',
+          'X-Bin-Private': 'false'
+        },
+        body: JSON.stringify({ messages: [] })
+      });
+      if (!resp.ok) {
+        var t = await resp.text();
+        throw new Error('创建 Bin 失败 HTTP ' + resp.status + ' — ' + t);
+      }
+      var data = await resp.json();
+      var id = data.metadata.id;
+      localStorage.setItem(LOCAL_BIN_KEY, id);
+      return id;
+    }
+
     async function loadMessages() {
-      if (!CONFIG.token || !CONFIG.owner || !CONFIG.repo || !CONFIG.issueNum) {
-        document.getElementById('messages').innerHTML =
-          '<div class="empty">⚠️ 网站还没配置好<br><br>' +
-          '请修改 index.html 里的 CONFIG 配置区<br>' +
-          '填入 token / owner / repo / issueNum</div>';
+      var messagesEl = document.getElementById('messages');
+      var key = CONFIG.masterKey;
+      if (!key || key === 'YOUR_MASTER_KEY_HERE') {
+        messagesEl.innerHTML =
+          '<div class="empty">⚠️ 还没配置<br><br>' +
+          '请修改 index.html 里的 CONFIG<br>填入 JSONBin 的 Master Key</div>';
         return;
       }
-      var messagesEl = document.getElementById('messages');
+
       messagesEl.innerHTML = '<div class="empty">加载中...</div>';
       try {
-        var resp = await fetch(
-          'https://api.github.com/repos/' + CONFIG.owner + '/' + CONFIG.repo +
-          '/issues/' + CONFIG.issueNum + '/comments',
-          { headers: { Authorization: 'token ' + CONFIG.token } }
-        );
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        var comments = await resp.json();
-        if (comments.length === 0) {
+        var binId = await getBinId();
+        if (!binId) {
+          binId = await createBin();
+          messagesEl.innerHTML =
+            '<div class="empty">✅ 已自动创建数据仓库<br>' +
+            'BIN_ID: <b>' + binId + '</b><br><br>' +
+            '请把这个 ID 填到 index.html 的 CONFIG.binId 里，<br>' +
+            '否则每次刷新都会重新创建一个新仓库！</div>';
+          return;
+        }
+
+        var resp = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
+          headers: { 'X-Master-Key': CONFIG.masterKey }
+        });
+        if (!resp.ok) {
+          var errText = await resp.text();
+          throw new Error('HTTP ' + resp.status + ' — ' + errText);
+        }
+        var data = await resp.json();
+        var messages = (data.record && data.record.messages) || [];
+
+        if (messages.length === 0) {
           messagesEl.innerHTML = '<div class="empty">还没有留言，快来抢沙发 🛋️</div>';
           return;
         }
-        messagesEl.innerHTML = comments.map(function(c) {
-          var body = c.body || '';
-          var name = '匿名';
-          var text = body;
-          var nickMatch = body.match(/^【([^】]+)】/);
-          if (nickMatch) {
-            name = nickMatch[1];
-            text = body.substring(nickMatch[0].length);
-          }
-          var time = new Date(c.created_at);
-          var timeStr = time.toLocaleString('zh-CN');
+
+        messages.sort(function(a, b) {
+          return new Date(b.time) - new Date(a.time);
+        });
+
+        messagesEl.innerHTML = messages.map(function(m) {
+          var name = m.name || '匿名';
+          var time = new Date(m.time);
+          var timeStr = formatTime(time);
           return '<div class="msg">' +
             '<div class="msg-top">' +
               '<span class="msg-name">' + escapeHtml(name) + '</span>' +
               '<span class="msg-time">' + timeStr + '</span>' +
             '</div>' +
-            '<div class="msg-content">' + escapeHtml(text) + '</div>' +
+            '<div class="msg-content">' + escapeHtml(m.text) + '</div>' +
           '</div>';
         }).join('');
       } catch(e) {
-        messagesEl.innerHTML = '<div class="empty">❌ 加载失败：' + e.message + '</div>';
+        messagesEl.innerHTML = '<div class="empty">❌ 加载失败：' + escapeHtml(e.message) + '</div>';
       }
     }
 
     async function postMessage() {
-      if (!CONFIG.token || !CONFIG.owner || !CONFIG.repo || !CONFIG.issueNum) {
-        alert('网站还没配置好，请先修改 index.html 里的 CONFIG 配置区');
+      var key = CONFIG.masterKey;
+      if (!key || key === 'YOUR_MASTER_KEY_HERE') {
+        alert('请先在 index.html 中配置 masterKey');
         return;
       }
       var input = document.getElementById('msgInput');
@@ -234,20 +249,35 @@
       btn.textContent = '发送中...';
 
       try {
-        var body = '【' + nickname + '】' + text;
-        var resp = await fetch(
-          'https://api.github.com/repos/' + CONFIG.owner + '/' + CONFIG.repo +
-          '/issues/' + CONFIG.issueNum + '/comments',
-          {
-            method: 'POST',
-            headers: {
-              Authorization: 'token ' + CONFIG.token,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ body: body })
-          }
-        );
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var binId = await getBinId();
+        if (!binId) binId = await createBin();
+
+        var getResp = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
+          headers: { 'X-Master-Key': CONFIG.masterKey }
+        });
+        if (!getResp.ok) throw new Error('读取失败 HTTP ' + getResp.status);
+        var data = await getResp.json();
+        var messages = (data.record && data.record.messages) || [];
+
+        messages.push({
+          name: nickname,
+          text: text,
+          time: new Date().toISOString()
+        });
+
+        var putResp = await fetch('https://api.jsonbin.io/v3/b/' + binId, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': CONFIG.masterKey
+          },
+          body: JSON.stringify({ messages: messages })
+        });
+        if (!putResp.ok) {
+          var errText = await putResp.text();
+          throw new Error('写入失败 HTTP ' + putResp.status + ' — ' + errText);
+        }
+
         input.value = '';
         loadMessages();
       } catch(e) {
@@ -258,10 +288,71 @@
       }
     }
 
+    async function testConfig() {
+      var el = document.getElementById('testResult');
+      el.style.display = 'block';
+      el.innerHTML = '<div class="empty">测试中...</div>';
+      var results = [];
+
+      var key = CONFIG.masterKey;
+      results.push('<b>1. 配置检查：</b>');
+      results.push('masterKey: ' + (key && key !== 'YOUR_MASTER_KEY_HERE'
+        ? '✅ 已填 (' + key.length + ' 字符)'
+        : '❌ 未配置'));
+      results.push('binId: ' + (CONFIG.binId && CONFIG.binId !== 'YOUR_BIN_ID_HERE'
+        ? '✅ ' + CONFIG.binId
+        : (localStorage.getItem(LOCAL_BIN_KEY)
+          ? '⚠️ 未在代码中配置，但本地缓存有：' + localStorage.getItem(LOCAL_BIN_KEY)
+          : '⚠️ 未配置（首次运行会自动创建）')));
+
+      results.push('<br><b>2. 测试 API 连接：</b>');
+      try {
+        var binId = await getBinId();
+        if (!binId) {
+          results.push('📦 Bin 不存在，尝试自动创建...');
+          binId = await createBin();
+          results.push('✅ 创建成功！BIN_ID = <b>' + binId + '</b>');
+          results.push('👉 请把这个 ID 复制到 CONFIG.binId 中');
+        } else {
+          var resp = await fetch('https://api.jsonbin.io/v3/b/' + binId + '/latest', {
+            headers: { 'X-Master-Key': CONFIG.masterKey }
+          });
+          results.push('HTTP 状态: ' + resp.status + ' ' + resp.statusText);
+          if (resp.ok) {
+            var data = await resp.json();
+            var count = (data.record && data.record.messages) ? data.record.messages.length : 0;
+            results.push('<span class="status-dot status-ok"></span>✅ 连接成功！共 ' + count + ' 条留言');
+          } else if (resp.status === 401) {
+            results.push('<span class="status-dot status-err"></span>❌ 401 = Master Key 错误');
+          } else if (resp.status === 404) {
+            results.push('<span class="status-dot status-err"></span>❌ 404 = Bin ID 不存在，已清除本地缓存');
+            localStorage.removeItem(LOCAL_BIN_KEY);
+          } else {
+            var t = await resp.text();
+            results.push('<span class="status-dot status-err"></span>❌ ' + t);
+          }
+        }
+      } catch(e) {
+        results.push('<span class="status-dot status-err"></span>❌ 请求失败: ' + escapeHtml(e.message));
+      }
+
+      el.innerHTML = results.join('<br>');
+    }
+
     function escapeHtml(text) {
       var div = document.createElement('div');
-      div.textContent = text;
+      div.textContent = String(text);
       return div.innerHTML;
+    }
+
+    function formatTime(d) {
+      var now = new Date();
+      var diff = now - d;
+      if (diff < 60000) return '刚刚';
+      if (diff < 3600000) return Math.floor(diff/60000) + ' 分钟前';
+      if (diff < 86400000) return Math.floor(diff/3600000) + ' 小时前';
+      if (diff < 7*86400000) return Math.floor(diff/86400000) + ' 天前';
+      return d.toLocaleString('zh-CN');
     }
 
     loadMessages();
